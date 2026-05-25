@@ -39,6 +39,9 @@ jobs:
 
       - uses: anthropics/claude-code-action@beta
         with:
+          # Disable branch creation — comment-only mode
+          create_pull_request: false
+
           # --- Authentication (pick ONE) ---
 
           # Option A: Pro/Max subscription (OAuth — no API costs)
