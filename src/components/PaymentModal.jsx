@@ -6,7 +6,7 @@ function generateOrderNumber() {
 
 export default function PaymentModal({ cart, onClose, onSuccess }) {
   const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
-  const tax = subtotal * 0.2;
+  const tax = subtotal * 0.1;
   const total = subtotal + tax;
 
   const [step, setStep] = useState("summary");
@@ -36,11 +36,23 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
     setForm((f) => ({ ...f, expiry: formatted }));
   }
 
+  function isExpiryValid(expiry) {
+    const match = /^(\d{2})\/(\d{2})$/.exec(expiry);
+    if (!match) return false;
+    const month = Number(match[1]);
+    const year = 2000 + Number(match[2]);
+    if (month < 1 || month > 12) return false;
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+    return year > currentYear || (year === currentYear && month >= currentMonth);
+  }
+
   const canPay =
-    form.name.trim() &&
+    /^[A-Za-z'-]+(\s+[A-Za-z'-]+)+$/.test(form.name.trim()) &&
     form.number.replace(/\s/g, "").length === 16 &&
-    form.expiry.length === 5 &&
-    form.cvv.length >= 3;
+    isExpiryValid(form.expiry) &&
+    form.cvv.length === 3;
 
   const formattedTime = orderTime.toLocaleString("en-GB", {
     day: "numeric",
@@ -72,7 +84,7 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
                 <span>Subtotal</span><span>€{subtotal.toFixed(2)}</span>
               </div>
               <div className="modal-totals-row">
-                <span>Tax (20%)</span><span>€{tax.toFixed(2)}</span>
+                <span>Tax (10%)</span><span>€{tax.toFixed(2)}</span>
               </div>
               <div className="modal-totals-row modal-totals-total">
                 <span>Total</span><span>€{total.toFixed(2)}</span>
@@ -131,9 +143,9 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
                     type="text"
                     inputMode="numeric"
                     placeholder="123"
-                    maxLength={4}
+                    maxLength={3}
                     value={form.cvv}
-                    onChange={(e) => setForm((f) => ({ ...f, cvv: e.target.value.replace(/\D/g, "").slice(0, 4) }))}
+                    onChange={(e) => setForm((f) => ({ ...f, cvv: e.target.value.replace(/\D/g, "").slice(0, 3) }))}
                   />
                 </label>
               </div>
