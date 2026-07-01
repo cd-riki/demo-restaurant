@@ -9,11 +9,11 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
   const tax = subtotal * 0.2;
   const total = subtotal + tax;
 
-  const [step, setStep] = useState("delivery");
+  const [step, setStep] = useState("summary");
   const [orderNumber] = useState(generateOrderNumber);
   const [orderTime] = useState(() => new Date());
   const [form, setForm] = useState({ name: "", number: "", expiry: "", cvv: "" });
-  const [delivery, setDelivery] = useState({ address: "", apartment: "", instructions: "" });
+  const [delivery, setDelivery] = useState({ address: "", apartment: "", postalCode: "", city: "", instructions: "" });
 
   useEffect(() => {
     if (step !== "processing") return;
@@ -43,11 +43,17 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
     form.expiry.length === 5 &&
     form.cvv.length >= 3;
 
-  const canContinueDelivery = delivery.address.trim().length > 0;
+  const canContinueDelivery =
+    delivery.address.trim().length > 0 &&
+    delivery.postalCode.trim().length > 0 &&
+    delivery.city.trim().length > 0;
 
-  const fullAddress = delivery.apartment.trim()
-    ? `${delivery.address}, ${delivery.apartment}`
-    : delivery.address;
+  const fullAddress = [
+    delivery.apartment.trim() ? `${delivery.address}, ${delivery.apartment}` : delivery.address,
+    `${delivery.postalCode} ${delivery.city}`.trim(),
+  ]
+    .filter(Boolean)
+    .join(", ");
 
   const formattedTime = orderTime.toLocaleString("en-GB", {
     day: "numeric",
@@ -60,54 +66,6 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
   return (
     <div className="modal-overlay" onClick={handleOverlayClick}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-
-        {step === "delivery" && (
-          <div className="modal-step">
-            <h2 className="modal-title">Delivery Details</h2>
-            <div className="card-form">
-              <label className="card-label">
-                Delivery address
-                <input
-                  className="card-input"
-                  type="text"
-                  placeholder="123 Main Street"
-                  value={delivery.address}
-                  onChange={(e) => setDelivery((d) => ({ ...d, address: e.target.value }))}
-                />
-              </label>
-              <label className="card-label">
-                Apartment number
-                <input
-                  className="card-input"
-                  type="text"
-                  placeholder="Apt 4B"
-                  value={delivery.apartment}
-                  onChange={(e) => setDelivery((d) => ({ ...d, apartment: e.target.value }))}
-                />
-              </label>
-              <label className="card-label">
-                Directions for the rider (optional)
-                <textarea
-                  className="card-input"
-                  rows={3}
-                  placeholder="e.g. Gate code 1234, leave with concierge"
-                  value={delivery.instructions}
-                  onChange={(e) => setDelivery((d) => ({ ...d, instructions: e.target.value }))}
-                />
-              </label>
-            </div>
-            <div className="modal-actions">
-              <button className="modal-btn-secondary" onClick={onClose}>Cancel</button>
-              <button
-                className="modal-btn-primary"
-                disabled={!canContinueDelivery}
-                onClick={() => setStep("summary")}
-              >
-                Continue
-              </button>
-            </div>
-          </div>
-        )}
 
         {step === "summary" && (
           <div className="modal-step">
@@ -134,9 +92,79 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
               </div>
             </div>
             <div className="modal-actions">
-              <button className="modal-btn-secondary" onClick={() => setStep("delivery")}>Back</button>
-              <button className="modal-btn-primary" onClick={() => setStep("card")}>
-                Proceed to Payment
+              <button className="modal-btn-secondary" onClick={onClose}>Cancel</button>
+              <button className="modal-btn-primary" onClick={() => setStep("delivery")}>
+                Continue
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === "delivery" && (
+          <div className="modal-step">
+            <h2 className="modal-title">Delivery Details</h2>
+            <div className="card-form">
+              <label className="card-label">
+                Delivery address
+                <input
+                  className="card-input"
+                  type="text"
+                  placeholder="123 Main Street"
+                  value={delivery.address}
+                  onChange={(e) => setDelivery((d) => ({ ...d, address: e.target.value }))}
+                />
+              </label>
+              <label className="card-label">
+                Apartment number
+                <input
+                  className="card-input"
+                  type="text"
+                  placeholder="Apt 4B"
+                  value={delivery.apartment}
+                  onChange={(e) => setDelivery((d) => ({ ...d, apartment: e.target.value }))}
+                />
+              </label>
+              <div className="card-row">
+                <label className="card-label">
+                  Postal code
+                  <input
+                    className="card-input"
+                    type="text"
+                    placeholder="75002"
+                    value={delivery.postalCode}
+                    onChange={(e) => setDelivery((d) => ({ ...d, postalCode: e.target.value }))}
+                  />
+                </label>
+                <label className="card-label">
+                  City
+                  <input
+                    className="card-input"
+                    type="text"
+                    placeholder="Paris"
+                    value={delivery.city}
+                    onChange={(e) => setDelivery((d) => ({ ...d, city: e.target.value }))}
+                  />
+                </label>
+              </div>
+              <label className="card-label">
+                Directions for the rider (optional)
+                <textarea
+                  className="card-input"
+                  rows={3}
+                  placeholder="e.g. Gate code 1234, leave with concierge"
+                  value={delivery.instructions}
+                  onChange={(e) => setDelivery((d) => ({ ...d, instructions: e.target.value }))}
+                />
+              </label>
+            </div>
+            <div className="modal-actions">
+              <button className="modal-btn-secondary" onClick={() => setStep("summary")}>Back</button>
+              <button
+                className="modal-btn-primary"
+                disabled={!canContinueDelivery}
+                onClick={() => setStep("card")}
+              >
+                Continue to Payment
               </button>
             </div>
           </div>
@@ -194,7 +222,7 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
               </div>
             </div>
             <div className="modal-actions">
-              <button className="modal-btn-secondary" onClick={() => setStep("summary")}>Back</button>
+              <button className="modal-btn-secondary" onClick={() => setStep("delivery")}>Back</button>
               <button
                 className="modal-btn-primary"
                 disabled={!canPay}
