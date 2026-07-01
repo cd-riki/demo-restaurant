@@ -37,7 +37,7 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
   }
 
   const canPay =
-    /^[A-Za-z\s'-]+$/.test(form.name.trim()) &&
+    /^[A-Za-z'-]+(\s+[A-Za-z'-]+)+$/.test(form.name.trim()) &&
     form.number.replace(/\s/g, "").length === 16 &&
     form.expiry.length === 5 &&
     form.cvv.length === 3;
