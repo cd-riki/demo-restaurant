@@ -9,10 +9,11 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
   const tax = subtotal * 0.2;
   const total = subtotal + tax;
 
-  const [step, setStep] = useState("summary");
+  const [step, setStep] = useState("delivery");
   const [orderNumber] = useState(generateOrderNumber);
   const [orderTime] = useState(() => new Date());
   const [form, setForm] = useState({ name: "", number: "", expiry: "", cvv: "" });
+  const [delivery, setDelivery] = useState({ address: "", apartment: "", instructions: "" });
 
   useEffect(() => {
     if (step !== "processing") return;
@@ -42,6 +43,12 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
     form.expiry.length === 5 &&
     form.cvv.length >= 3;
 
+  const canContinueDelivery = delivery.address.trim().length > 0;
+
+  const fullAddress = delivery.apartment.trim()
+    ? `${delivery.address}, ${delivery.apartment}`
+    : delivery.address;
+
   const formattedTime = orderTime.toLocaleString("en-GB", {
     day: "numeric",
     month: "short",
@@ -53,6 +60,54 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
   return (
     <div className="modal-overlay" onClick={handleOverlayClick}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
+
+        {step === "delivery" && (
+          <div className="modal-step">
+            <h2 className="modal-title">Delivery Details</h2>
+            <div className="card-form">
+              <label className="card-label">
+                Delivery address
+                <input
+                  className="card-input"
+                  type="text"
+                  placeholder="123 Main Street"
+                  value={delivery.address}
+                  onChange={(e) => setDelivery((d) => ({ ...d, address: e.target.value }))}
+                />
+              </label>
+              <label className="card-label">
+                Apartment number
+                <input
+                  className="card-input"
+                  type="text"
+                  placeholder="Apt 4B"
+                  value={delivery.apartment}
+                  onChange={(e) => setDelivery((d) => ({ ...d, apartment: e.target.value }))}
+                />
+              </label>
+              <label className="card-label">
+                Directions for the rider (optional)
+                <textarea
+                  className="card-input"
+                  rows={3}
+                  placeholder="e.g. Gate code 1234, leave with concierge"
+                  value={delivery.instructions}
+                  onChange={(e) => setDelivery((d) => ({ ...d, instructions: e.target.value }))}
+                />
+              </label>
+            </div>
+            <div className="modal-actions">
+              <button className="modal-btn-secondary" onClick={onClose}>Cancel</button>
+              <button
+                className="modal-btn-primary"
+                disabled={!canContinueDelivery}
+                onClick={() => setStep("summary")}
+              >
+                Continue
+              </button>
+            </div>
+          </div>
+        )}
 
         {step === "summary" && (
           <div className="modal-step">
@@ -79,7 +134,7 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
               </div>
             </div>
             <div className="modal-actions">
-              <button className="modal-btn-secondary" onClick={onClose}>Cancel</button>
+              <button className="modal-btn-secondary" onClick={() => setStep("delivery")}>Back</button>
               <button className="modal-btn-primary" onClick={() => setStep("card")}>
                 Proceed to Payment
               </button>
@@ -164,6 +219,7 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
             <div className="success-icon">✓</div>
             <h2 className="success-title">Payment Successful!</h2>
             <p className="success-meta">Order {orderNumber} · {formattedTime}</p>
+            <p className="success-meta">Delivering to {fullAddress}</p>
             <ul className="modal-item-list modal-item-list--receipt">
               {cart.map((item, i) => (
                 <li key={i} className="modal-item-row">
