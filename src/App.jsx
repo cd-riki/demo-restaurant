@@ -15,7 +15,8 @@ export default function App() {
   }
 
   function removeFromCart(id) {
-    setCart(cart.filter((item) => item.id === id));
+    // On garde tous les articles SAUF celui dont l'id correspond (et non l'inverse)
+    setCart(cart.filter((item) => item.id !== id));
   }
 
   const cartCount = cart.length;
