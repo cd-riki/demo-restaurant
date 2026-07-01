@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { pickEtaMinutes } from "../data.js";
+import { formatHM } from "../utils.js";
 
 function generateOrderNumber() {
   return "DL-" + Math.floor(10000 + Math.random() * 90000);
@@ -12,12 +14,17 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
   const [step, setStep] = useState("summary");
   const [orderNumber] = useState(generateOrderNumber);
   const [orderTime] = useState(() => new Date());
+  const [etaMinutes] = useState(pickEtaMinutes);
+  const [orderStartedAt, setOrderStartedAt] = useState(null);
   const [form, setForm] = useState({ name: "", number: "", expiry: "", cvv: "" });
   const [delivery, setDelivery] = useState({ address: "", apartment: "", postalCode: "", city: "", instructions: "" });
 
   useEffect(() => {
     if (step !== "processing") return;
-    const timer = setTimeout(() => setStep("success"), 2000);
+    const timer = setTimeout(() => {
+      setOrderStartedAt(Date.now());
+      setStep("success");
+    }, 2000);
     return () => clearTimeout(timer);
   }, [step]);
 
@@ -248,6 +255,11 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
             <h2 className="success-title">Payment Successful!</h2>
             <p className="success-meta">Order {orderNumber} · {formattedTime}</p>
             <p className="success-meta">Delivering to {fullAddress}</p>
+            {orderStartedAt && (
+              <p className="success-eta">
+                Arrivée estimée à {formatHM(new Date(orderStartedAt + etaMinutes * 60000))} · {etaMinutes} min
+              </p>
+            )}
             <ul className="modal-item-list modal-item-list--receipt">
               {cart.map((item, i) => (
                 <li key={i} className="modal-item-row">
@@ -263,8 +275,11 @@ export default function PaymentModal({ cart, onClose, onSuccess }) {
                 <span>Total paid</span><span>€{total.toFixed(2)}</span>
               </div>
             </div>
-            <button className="modal-btn-primary modal-btn-full" onClick={onSuccess}>
-              Start New Order
+            <button
+              className="modal-btn-primary modal-btn-full"
+              onClick={() => onSuccess({ etaMinutes, startedAt: orderStartedAt, address: fullAddress })}
+            >
+              Suivre ma commande
             </button>
           </div>
         )}

@@ -68,6 +68,133 @@ body {
   50% { opacity: 0.4; }
 }
 
+/* ─── Order tracker ───────────────────────────────────── */
+.order-tracker {
+  position: relative;
+}
+
+.order-tracker-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px 5px 10px;
+  background: linear-gradient(135deg, #e6faf8 0%, #d4f5f1 100%);
+  border: 1px solid #b8ebe5;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #008f84;
+  white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(0, 193, 178, 0.12);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.order-tracker-chip .eta-icon {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.order-tracker-chip .eta-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #00c1b2;
+  box-shadow: 0 0 0 3px rgba(0, 193, 178, 0.18);
+  animation: eta-pulse 1.8s ease-in-out infinite;
+}
+
+.order-tracker-chip.delivered {
+  background: linear-gradient(135deg, #e6faf8 0%, #d4f5f1 100%);
+  color: #00875a;
+}
+
+.order-tracker-chip.delivered .eta-dot {
+  display: none;
+}
+
+.order-tracker-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 260px;
+  background: white;
+  border: 1px solid #ede9e4;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(26, 39, 31, 0.14);
+  padding: 14px 16px;
+  z-index: 20;
+}
+
+.order-tracker-eta {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #1a271f;
+  margin-bottom: 10px;
+}
+
+.order-tracker-steps {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.order-tracker-step {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #c8c4bf;
+}
+
+.order-tracker-step.done {
+  color: #9aaba0;
+}
+
+.order-tracker-step.active {
+  color: #00c1b2;
+}
+
+.order-tracker-delay {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #b45309;
+  margin-bottom: 8px;
+}
+
+.order-tracker-address {
+  font-size: 0.7rem;
+  color: #9aaba0;
+}
+
+.order-toast {
+  position: fixed;
+  top: 76px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+  color: #9a3412;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(26, 39, 31, 0.14);
+  z-index: 30;
+  max-width: 320px;
+}
+
+.order-toast-close {
+  background: none;
+  border: none;
+  color: #9a3412;
+  cursor: pointer;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
 .cart-badge-wrapper {
   position: relative;
   font-size: 1.5rem;
@@ -640,4 +767,11 @@ body {
   font-size: 0.8rem;
   color: #9aaba0;
   margin-bottom: 8px;
+}
+
+.success-eta {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #008f84;
+  margin-bottom: 12px;
 }

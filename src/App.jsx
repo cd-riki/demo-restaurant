@@ -3,12 +3,14 @@ import { dishes, deliveryInfo } from "./data";
 import Menu from "./components/Menu";
 import Cart from "./components/Cart";
 import PaymentModal from "./components/PaymentModal";
+import OrderTracker from "./components/OrderTracker";
 import "./App.css";
 
 export default function App() {
   const [cart, setCart] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [showPayment, setShowPayment] = useState(false);
+  const [order, setOrder] = useState(null);
 
   function addToCart(dish) {
     setCart((prev) => [...prev, { ...dish, quantity: 1 }]);
@@ -26,11 +28,15 @@ export default function App() {
         <div style={{display:"flex",alignItems:"center",gap:"12px"}}>
           <img src="/restaurant-demo/deliveroo-logo.png" alt="Deliveroo" height="36" />
           <h1>roo<span style={{color:"#1a271f"}}>food</span></h1>
-          <span className="delivery-eta">
-            <span className="eta-dot" />
-            <span className="eta-icon">🛵</span>
-            Delivery in {deliveryInfo.etaMin}–{deliveryInfo.etaMax} min
-          </span>
+          {order ? (
+            <OrderTracker order={order} onDismiss={() => setOrder(null)} />
+          ) : (
+            <span className="delivery-eta">
+              <span className="eta-dot" />
+              <span className="eta-icon">🛵</span>
+              Delivery in {deliveryInfo.etaMin}–{deliveryInfo.etaMax} min
+            </span>
+          )}
         </div>
         <div className="cart-badge-wrapper">
           <span className="cart-icon">🛒</span>
@@ -51,7 +57,7 @@ export default function App() {
         <PaymentModal
           cart={cart}
           onClose={() => setShowPayment(false)}
-          onSuccess={() => { setCart([]); setShowPayment(false); }}
+          onSuccess={(placedOrder) => { setCart([]); setShowPayment(false); setOrder(placedOrder); }}
         />
       )}
     </div>

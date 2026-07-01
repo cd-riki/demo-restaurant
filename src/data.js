@@ -5,6 +5,20 @@ export const deliveryInfo = {
 
 export const TAX_RATE = 0.20;
 
+// Simulated ETA model: no live rider-assignment or logistics backend exists in
+// this demo, so we pick a value within the generic restaurant range instead of
+// a real prep-time + trip-time calculation (see spec open questions).
+export function pickEtaMinutes(info = deliveryInfo) {
+  return Math.round(info.etaMin + Math.random() * (info.etaMax - info.etaMin));
+}
+
+export const ORDER_STEPS = [
+  "Commande confirmée",
+  "En préparation par le restaurant",
+  "Récupérée par le livreur",
+  "Arrivée imminente",
+];
+
 export const dishes = [
   { id: 1, name: "Bruschetta", description: "Toasted bread with tomatoes, garlic and fresh basil", price: 6.5, category: "Starters", emoji: "🍞" },
   { id: 2, name: "Soup of the Day", description: "Ask your waiter for today's homemade soup", price: 5.0, category: "Starters", emoji: "🍲" },
